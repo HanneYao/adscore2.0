@@ -228,20 +228,7 @@ else:
 # 主页路由
 @app.route('/')
 def index():
-    if not os.path.exists('index.html'):
-        return '''
-        <!DOCTYPE html>
-        <html>
-        <head><title>错误 - 文件缺失</title></head>
-        <body>
-            <h1>错误: index.html 文件不存在</h1>
-            <p>请在当前目录创建 index.html 文件</p>
-            <p>当前目录: {}</p>
-        </body>
-        </html>
-        '''.format(os.getcwd())
-    
-    return send_from_directory('.', 'index.html')
+    return render_template('index.html')
 
 # API路由
 @app.route('/api/theme-tags', methods=['GET'])
@@ -441,10 +428,6 @@ def health_check():
         'csv_error': csv_error
     })
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
 @app.route('/debug')
 def debug_info():
     files = os.listdir('.')
@@ -473,10 +456,14 @@ def debug_info():
     '''
 
 if __name__ == '__main__':
-    print("服务器启动在:")
-    print("✓ http://127.0.0.1:5000/ (推荐)")
-    print("○ http://localhost:5000/ (如果上面不行)")
-    print("=" * 60)
-    
-    # 绑定到127.0.0.1解决localhost解析问题
-    app.run(debug=True, port=5000, host='127.0.0.1')
+    # 检查是否在 PythonAnywhere 环境中
+    if 'PYTHONANYWHERE_DOMAIN' in os.environ:
+        # 在生产环境中使用
+        app.run(debug=False)
+    else:
+        # 在开发环境中使用
+        print("服务器启动在:")
+        print("✓ http://127.0.0.1:5000/ (推荐)")
+        print("○ http://localhost:5000/ (如果上面不行)")
+        print("=" * 60)
+        app.run(debug=True, port=5000, host='127.0.0.1')
